@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Live Weather</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav>
+    <a href="index.html">Home</a>
+    <a href="weather.html">Weather</a>
+    <a href="traffic.html">Traffic</a>
+</nav>
+
+<div class="container">
+    <h2>Check Weather</h2>
+    <input type="text" id="city" placeholder="Enter City">
+    <button onclick="getWeather()">Get Weather</button>
+    <div id="weatherResult"></div>
+</div>
+
+<script>
+    const API_KEY = "YOUR_OPENWEATHERMAP_API_KEY"; // Replace with your key
+
+    function getWeather() {
+        const city = document.getElementById("city").value;
+        fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById("weatherResult").innerHTML = `
+                <h3>${data.name}, ${data.sys.country}</h3>
+                <p><strong>Temperature:</strong> ${data.main.temp}°C</p>
+                <p><strong>Weather:</strong> ${data.weather[0].description}</p>
+                <p><strong>Humidity:</strong> ${data.main.humidity}%</p>
+            `;
+        })
+        .catch(() => {
+            document.getElementById("weatherResult").innerHTML = "<p>City not found.</p>";
+        });
+    }
+</script>
+
+</body>
+</html>

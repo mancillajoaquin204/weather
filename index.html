@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Directions</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+</head>
+<body>
+
+<nav>
+    <a href="index.html">Home</a>
+    <a href="weather.html">Weather</a>
+    <a href="traffic.html">Traffic</a>
+</nav>
+
+<div class="container">
+    <input type="text" id="start" placeholder="Start Location">
+    <input type="text" id="end" placeholder="End Location">
+    <button onclick="getRoute()">Find Route</button>
+    <div id="map" style="height: 500px;"></div>
+</div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.min.js"></script>
+<script>
+    var map = L.map('map').setView([20.5937, 78.9629], 5);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    var control;
+
+    function getRoute() {
+        const start = document.getElementById('start').value;
+        const end = document.getElementById('end').value;
+
+        if (control) map.removeControl(control);
+
+        Promise.all([
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${start}`),
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${end}`)
+        ])
+        .then(res => Promise.all(res.map(r => r.json())))
+        .then(([s, e]) => {
+            if (!s[0] || !e[0]) return alert("Invalid locations");
+            control = L.Routing.control({
+                waypoints: [
+                    L.latLng(s[0].lat, s[0].lon),
+                    L.latLng(e[0].lat, e[0].lon)
+                ]
+            }).addTo(map);
+        });
+    }
+</script>
+</body>
+</html>
